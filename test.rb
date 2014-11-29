@@ -10,11 +10,20 @@ class Task
   property :id,           Serial
   property :name,         String, :required => true
   property :completed_at, DateTime
+  belongs_to :list
 end
+
+class List
+  include DataMapper::Resource
+  property :id,           Serial
+  property :name,         String, :required => true
+  has n, :tasks, :constraint => :destroy
+end
+
 DataMapper.finalize
 
 get '/' do
-  @tasks = Task.all
+  @lists = List.all(:order => [:name])
   slim :index
 end
 
@@ -23,8 +32,8 @@ get '/:task' do
   slim :task
 end
 
-post '/' do
-  Task.create  params[:task]
+post '/:id' do
+  List.get(params[:id]).tasks.create params['task']
   redirect to('/')
 end
 
@@ -37,6 +46,16 @@ end
 
 delete '/task/:id' do
   Task.get(params[:id]).destroy
+  redirect to('/')
+end
+
+post '/new/list' do
+  List.create params['list']
+  redirect to('/')
+end
+
+delete '/list/:id' do
+  List.get(params[:id]).destroy
   redirect to('/')
 end
 
