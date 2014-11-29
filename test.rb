@@ -2,6 +2,7 @@ require 'sinatra'
 require 'data_mapper'
 require 'slim'
 require 'shotgun'
+require 'sass'
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/development.db")
 
@@ -57,6 +58,10 @@ end
 delete '/list/:id' do
   List.get(params[:id]).destroy
   redirect to('/')
+end
+
+get '/styles.css' do
+  scss :styles
 end
 
 __END__
